@@ -1,0 +1,372 @@
+# In this lesson, we're going to seed or generate sample products in MongoDB database and replace the backend API to MongoDB database instead of static data that takes
+ 
+# Here is the plan to seed sample data to MongoDB database.
+# 20. Seed Sample Data
+#	1. Create Product model	
+#	2. create User model
+#	3. create seed route
+#	4. use route in server.js
+#	5. seed sample product
+
+# Let us start by creating a model for product. in the backend folder, Create a new folder: models and inside that define productModel.js.
+/amazonf/backend
+$ mkdir models
+$ cd models
+$ > productModel.js
+
+# What we're going to do here is to create mongoose model.
+
+# Let us start by importing mongoose and define Mongoose Schema.
+import express from 'express'
+# To do that, the final productSchema equal to new mongoose.Schema()
+const productSchema = new mongoose.Schema()
+# that schema accept an object as a parameter, and this object defines the fields of product in the object.
+
+#Let's define the first field for the product.
+
+# The first field is the name, the type is a string and it's required and it's unique, so it should have data because it's required.
+const productSchema = new mongoose.Schema({
+	name: {type:String, required:true, unique:true},
+
+#Otherwise, it throws an error and it should be unique.
+
+#If we want to insert duplicate name, it throws an error.
+
+#Let's go for the next field.
+
+# It's a slug type as a string required like name. It should be unique to.
+
+const productSchema = new mongoose.Schema({
+	name: {type:String, required:true, unique:true},
+	slug: { type: String, required: true, unique: true },
+    
+# The next field is image of type of string, and it's required. it can have duplicate images.
+	image: { type: String, required: true },
+
+# Next one is brand of type string.
+    brand: { type: String, required: true },
+    
+# The next one is category and description of type a string.
+	category: { type: String, required: true },
+    description: { type: String, required: true },
+    
+# The next field for the product is 'price'. This time the type is Number. 
+	price: { type: Number, required: true },
+    
+
+# next field is countInStock.
+	countInStock: { type: Number, required: true },
+    
+# Next field is rating, and numReviews
+	rating: { type: Number, required: true },
+    numReviews: { type: Number, required: true },
+},
+# new mongoose.Schema accepts two parameters.
+
+#The first parameter is the field of the schema, and the second one is options.
+
+# The options that I am going to use is timestamp and set it to true by having this setting.
+{
+    timestamps: true,
+  }
+);
+# Then we create a record or a document in the product collection automatically to new fields will be added to this field created at an updated act so we can have the last update time and create time of each record.
+
+# After creating this schema, it's time to create a model based on that schema.
+
+# Here is the command to do this.
+
+# The final product equal to mongoose dot model.
+const product = mongoose.model()
+# The first parameter is the name of this model, and second parameter is the schema.
+const product = mongoose.model('Product', productSchema)
+# At the end, we need to export default product.
+export default product
+
+# I am going to seed or generate some products in the database.
+
+# To do that, go to backend folder and create a new folder named routes because I'm going to make the APIs in the back end project modular.
+/backend
+$ mkdir routes
+# That's why I created a routs folder and inside that to create is seedRoutes dot js.
+cd routes
+/backend/routes
+$ > seedRoutes.js
+# First of all, we need to import express because we are going to create a route from express router.
+import express from 'express'
+import Product from '../models/productModel.js';
+import data from '../data.js';
+
+# Here is the command to create a root express router.
+const seedRouter = express.Router();
+# seedRouter is an object from express, router function and like what they did for app in the server.js I can define yet API on the seedRouter using dot get function.
+seedRouter.get()
+# The first parameter is the path and second parameter is an async function, and close this inside this async function.
+seedRouter.get('/', async (req, res) => {
+})
+# I'm going to, first of all, remove all previous records in the product model using await product. It's a mongoose model object and called remove and pass parameter to empty object.
+seedRouter.get('/', async (req, res) => {
+  await Product.remove({});
+  
+});
+
+# It means that we remove all records inside product model.
+
+# And then it's time to create new products.
+
+# The product that I'm going to add is coming from data 
+
+# We call product.insertMany to insert an array of products to their product model in the database and return the created product in the createdProduct variable.
+	const CreatedProducts = await Product.insertMany(data.products);
+  
+# At the end, it's time to send back products to the front end using this command.
+	res.send({ CreatedProducts });
+# At the end, we need to export default.
+export default seedRouter
+# save the file
+
+# go back to server.js and right after creating app from express Call app dot use function.
+const app = express() 
+app.use() # new
+# The first part of there is the path of seed API and second parameter is seedRouter (press control+space+tab to imports from seedRouter).
+app.use('/api/seed', seedRouter);
+# So when server interface slash api slash seed, seedRouter will respond to it in the seedRouter dot js after product model 
+
+# go to data.js and comment out all _id
+
+# Because they are going to be assigned automatically by MongoDB, commen
+
+# save the file.
+
+# Otherwise you will get this error for underlying ID.
+
+# _id should be a string of twenty four hex characters.
+
+# After this, go to google chrome , type this address localhost:5000/api/seed and press enter.
+
+# Here is the result you are getting created product and we have two new fields the ID, which is assigned
+
+# automatically for each record and the version, and also created and updated at because we are using
+
+# timestamp through.
+
+# We have these two new fields in each record or document in the product collection.
+
+# We successfully create that sample products for our project and we can go to the routes folder.
+
+# Create a new route named productRoutes.js
+
+# and then like what they did in their seed roots.
+import express from 'express'
+
+# Create product router with express.Router function
+
+# Let's define the first route.
+const productRouter = express.Router()
+# It's at this address a slash.
+const productRouter = express.Router('/')
+# The /api/products prefix will be added in server.js
+
+# Yes, so I'm just using a slash, and it means that /api/products in the server that takes here is the first API that I'm going to implement.
+
+# The first API that we are going to implement is this async function.
+
+# It returns all products using this command await product that find and (let's import product from product model) at the end res send products.
+productRouter.get('/', async (req, res) => {
+  const products = await Product.find();
+  res.send(products);
+});
+export default productRouter
+# So here in the server.js , delete several lines line 21 to line 23 
+app.get('/api/products', (req, res) => {
+res.send(data.products);
+})
+# and add
+app.use('/product', productRouter); 
+
+# import productRouter at the beginning of server.js file
+import express from 'express';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import seedRouter from './routes/seedRoutes.js';
+import productRouter from './routes/productRoutes.js';
+
+dotenv.config();
+
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log('connected to db');
+  })
+  .catch((err) => {
+    console.log(err.message);
+  });
+
+const app = express();
+app.use('/api/seed', seedRouter);
+app.use('/api/products', productRouter);
+
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
+  console.log(`serve at http://localhost:${port}`);
+});
+
+# Save the file 
+# paste into productRoutes.js
+app.get('/api/products/slug/:slug', (req, res) => {
+  const product = data.products.find((x) => x.slug === req.params.slug);
+  if (product) {
+    res.send(product);
+  } else {
+    res.status(404).send({ message: 'Product Not Found' });
+  }
+});
+app.get('/api/products/:id', (req, res) => {
+  const product = data.products.find((x) => x._id === req.params.id);
+  if (product) {
+    res.send(product);
+  } else {
+    res.status(404).send({ message: 'Product Not Found' });
+  }
+});
+# We are going to convert them to this style, change from app.get to productRouter.get 2 times 
+# change /api/products/slug to /slug
+# change /api/product/:id to /:id
+# change (req, res) to async (req, res) 2 times
+# the above code shoud become
+productRouter.get('/slug/:slug', async (req, res) => {
+  const product = await Product.findOne({ slug: req.params.slug });
+  if (product) {
+    res.send(product);
+  } else {
+    res.status(404).send({ message: 'Product Not Found' });
+  }
+});
+productRouter.get('/:id', async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (product) {
+    res.send(product);
+  } else {
+    res.status(404).send({ message: 'Product Not Found' });
+  }
+});
+
+# Save the file and refresh.
+
+And there we are.
+
+The data here is coming from MongoDB database to make sure that they are coming from MongoDB open developer
+
+tools and go to network and for the first product, click Add to cart, as you see here.
+
+The address is a slash API slash product and instead of von the data here, it's an idea from MongoDB database.
+#############################################################################################3333
+## Video 
+
+# In this lesson, we are going to seed sample users, but we're going to do is to create a user model and then create two sample users, admin users and customer  user then generate encrypted password for them. And at the end, we will have two users in the database for the next lesson, which is sign in backend API.
+
+# To get the source code of this lesson, go to the repository, find the comments for video or to any
+
+# Here is the plan to seed sample users like what they did for products, 
+# 21. Seed Sample Users
+#	1.create user model
+#	2. seed sample users
+#	3. create user routes 
+# go to productModel.js, duplicate it and rename it to userModel.js
+
+# So the first step is creating user model.
+
+# Remove all fields and only keep the name.
+	name: { type: String, required: true },
+# It's going to be the user name.
+	
+# The next field is the email of user.
+	email: { type: String, required: true, unique: true },
+    
+# It's required and unique.
+
+# Next one is the password of user.
+password: {type:String, required: true}, 
+# The next field is isAdmin.
+
+# Its type is boolean and default is false and it's required too 
+isAdmin: {type:Boolean, default: false, required: true}
+# for the name field I'm going to get rid of unique because two users may have the same name
+# change productSchema  to userSchema 2 places.
+import mongoose from 'mongoose';
+
+const productSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true  },
+    email : { type: String, required: true, unique: true },
+    password: {type:String, required: true}, 
+    isAdmin: {type:Boolean, default: false, required: true} 
+  },
+  {
+    timestamps: true,
+  }
+);
+const User = mongoose.model('User', productSchema);
+export default User;
+# Save the file and go to seedRoutes.js like what they did for product.
+
+# Do the same for their users.
+await User.remove({});
+  const CreatedUsers = await User.insertMany(data.users);
+  res.send({ CreatedProducts, CreatedUsers });
+
+# The next step is going to be creating users inside data.
+
+#Go to data.js
+
+#And before products, create users array and inside that, I'm going to create two users, the first user and second one.
+# for the first one set Name to your name.
+
+# Email to admin@example.com.
+
+#But for the password, I'm going to encrypt it.
+
+#Using bcrypt.hashSync set the pass for  one two three four five six.
+
+#bcrypt is a package from bcrypt.
+
+#let's install it. open termimal.
+
+#Go to a new terminal, go to backend folder and npm Install bcrypt GSI,
+/backend
+$ npm i bcriptjs
+
+# then imported here and then go for the next user.
+
+#name: John, email: user@example.com and password is bcrypt.hashSync 123456 isAdmin is false.
+import bcript from 'bcryptjs';
+
+const data = {
+  users: [
+    {
+      name: "Truong",
+      email: 'admin@example.com',
+      password: bcript.hashSync('123456'),
+      isAdmin: true
+    },
+    {
+       name: 'John',
+       email: 'user@example.com',
+       password: bcrypt.hasSync('123456'),
+       isAdmin: false,
+    }
+  ],
+  products: [
+
+#Save the file and let's check the result.
+
+#google chrome Open a new tab.
+
+#Go to localhost:5000/api/seed and we have created products and created user.
+
+#If you check that password here is encrypted using bcryptjs and we have name and email and isAdmin.
+
+#Here is true and for regular users is false.
+
+#We successfully created sample users.
+
