@@ -7,7 +7,7 @@ import { Store } from '../Store';
 const Product = ({ product }) => {
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart } = state;
-  const addToCart = () => {
+  const addToCartHandler = () => {
     const existItem = cart.cartItems.find((x) => x._id === product._id);
     const quantity = existItem ? existItem.quantity + 1 : 1;
     ctxDispatch({ type: 'CART_ADD_ITEM', payload: { ...product, quantity } });
@@ -28,7 +28,10 @@ const Product = ({ product }) => {
             Out of Stock
           </Button>
         ) : (
-          <Button onClick={addToCart} disabled={product.countInStock === 0}>
+          <Button
+            onClick={addToCartHandler}
+            disabled={product.countInStock === 0}
+          >
             Add to cart
           </Button>
         )}

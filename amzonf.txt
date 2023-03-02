@@ -369,4 +369,19 @@ const data = {
 #Here is true and for regular users is false.
 
 #We successfully created sample users.
+------------------------------------------------------
+truon@truong MINGW64 /d/year2023/amazonf/frontend (master)
+$ npm i react-toastify
+
+added 2 packages, and audited 1509 packages in 13s
+
+233 packages are looking for funding
+  run `npm fund` for details
+
+6 high severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
 

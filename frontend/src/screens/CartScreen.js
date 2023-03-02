@@ -33,7 +33,6 @@ export default function CartScreen() {
   };
 
   const checkoutHandler = () => {
-    console.log('error here?');
     navigate('/signin?redirect=/shipping');
   };
 
